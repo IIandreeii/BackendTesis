@@ -1,0 +1,18 @@
+{
+    "sourceFile": "src/models/donation.js",
+    "activeCommit": 0,
+    "commits": [
+        {
+            "activePatchIndex": 0,
+            "patches": [
+                {
+                    "date": 1731015153011,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n"
+                }
+            ],
+            "date": 1731015153011,
+            "name": "Commit-0",
+            "content": "import mongoose from 'mongoose';\r\n\r\nconst { Schema } = mongoose;\r\n\r\nconst DonationSchema = new Schema({\r\n  charityId: { \r\n    type: Schema.Types.ObjectId, \r\n    ref: 'Charity', \r\n    required: true \r\n  },\r\n  donorName: { \r\n    type: String, \r\n    required: true \r\n  },\r\n  amount: { \r\n    type: Number, \r\n    required: true \r\n  },\r\n  paymentId: { \r\n    type: String, \r\n    required: true, \r\n    unique: true // Asegura que cada ID de pago sea único\r\n  },\r\n  paymentStatus: { \r\n    type: String, \r\n    required: true \r\n  },\r\n  paymentMethod: { \r\n    type: String, \r\n    required: true \r\n  },\r\n  paymentDate: { \r\n    type: Date, \r\n    default: Date.now \r\n  },\r\n  cardLastFourDigits: { \r\n    type: String \r\n  }, // Opcional para almacenar los últimos 4 dígitos del número de tarjeta\r\n  currency: { \r\n    type: String, \r\n    default: 'PEN' // Cambiar según la moneda predeterminada\r\n  },\r\n}, {\r\n  timestamps: true\r\n});\r\n\r\nexport default mongoose.model(\"Donation\", DonationSchema);"
+        }
+    ]
+}

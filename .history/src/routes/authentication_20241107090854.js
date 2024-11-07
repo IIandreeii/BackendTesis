@@ -83,6 +83,14 @@ router.post('/signin', async (req, res, next) => {
 });
 
 
+
+
+
+
+
+
+
+
 // Asegúrate de ajustar la ruta según tu estructura de proyecto
 
 router.get('/profile', passport.authenticate('jwt', { session: false }), async (req, res, next) => {

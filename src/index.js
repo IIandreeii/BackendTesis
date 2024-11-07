@@ -9,6 +9,7 @@ import cors from 'cors';
 
 import major from './routes/index.js'
 import auth from './routes/authentication.js'
+import mercadopago from './routes/mercadopago.js'
 import connectDB from './database.js';
 
 import './lib/auth.js';
@@ -44,6 +45,7 @@ app.use((req, res, next) => {
 
 app.use(major);
 app.use(auth)
+app.use(mercadopago)
 
 
 app.listen(app.get('port'), () =>{
