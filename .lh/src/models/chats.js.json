@@ -1,0 +1,46 @@
+{
+    "sourceFile": "src/models/chats.js",
+    "activeCommit": 0,
+    "commits": [
+        {
+            "activePatchIndex": 7,
+            "patches": [
+                {
+                    "date": 1731384884316,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n"
+                },
+                {
+                    "date": 1731385243758,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -7,5 +7,5 @@\n }, { timestamps: true });\r\n \r\n const Chat = mongoose.model('Chat', chatSchema);\r\n \r\n-module.exports = Chat;\n\\ No newline at end of file\n+export default Chat;\n\\ No newline at end of file\n"
+                },
+                {
+                    "date": 1731385257065,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -1,11 +1,31 @@\n-const mongoose = require('mongoose');\r\n+// FILE: src/models/chats.js\r\n+import mongoose from 'mongoose';\r\n \r\n const chatSchema = new mongoose.Schema({\r\n-  participants: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],\r\n-  lastMessage: { type: mongoose.Schema.Types.ObjectId, ref: 'Message' },\r\n-  unreadMessages: { type: Map, of: Number },\r\n-}, { timestamps: true });\r\n+    participants: {\r\n+        type: [mongoose.Schema.Types.ObjectId],\r\n+        ref: 'User',\r\n+        required: true\r\n+    },\r\n+    lastMessage: {\r\n+        type: mongoose.Schema.Types.ObjectId,\r\n+        ref: 'Message'\r\n+    },\r\n+    unreadMessages: {\r\n+        type: Map,\r\n+        of: Number,\r\n+        default: {}\r\n+    },\r\n+    createdAt: {\r\n+        type: Date,\r\n+        default: Date.now\r\n+    },\r\n+    updatedAt: {\r\n+        type: Date,\r\n+        default: Date.now\r\n+    }\r\n+});\r\n \r\n const Chat = mongoose.model('Chat', chatSchema);\r\n \r\n export default Chat;\n\\ No newline at end of file\n"
+                },
+                {
+                    "date": 1731385339608,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -25,7 +25,7 @@\n         default: Date.now\r\n     }\r\n });\r\n \r\n-const Chat = mongoose.model('Chat', chatSchema);\r\n+const Chat = mongoose.models.Chat || mongoose.model('Chat', chatSchema);\r\n \r\n export default Chat;\n\\ No newline at end of file\n"
+                },
+                {
+                    "date": 1731390581855,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -1,30 +1,29 @@\n-// FILE: src/models/chats.js\r\n import mongoose from 'mongoose';\r\n \r\n const chatSchema = new mongoose.Schema({\r\n-    participants: {\r\n-        type: [mongoose.Schema.Types.ObjectId],\r\n-        ref: 'User',\r\n-        required: true\r\n-    },\r\n-    lastMessage: {\r\n-        type: mongoose.Schema.Types.ObjectId,\r\n-        ref: 'Message'\r\n-    },\r\n-    unreadMessages: {\r\n-        type: Map,\r\n-        of: Number,\r\n-        default: {}\r\n-    },\r\n-    createdAt: {\r\n-        type: Date,\r\n-        default: Date.now\r\n-    },\r\n-    updatedAt: {\r\n-        type: Date,\r\n-        default: Date.now\r\n-    }\r\n+  participants: {\r\n+    type: [mongoose.Schema.Types.ObjectId],\r\n+    ref: 'User',\r\n+    required: true\r\n+  },\r\n+  lastMessage: {\r\n+    type: mongoose.Schema.Types.ObjectId,\r\n+    ref: 'Message'\r\n+  },\r\n+  unreadMessages: {\r\n+    type: Map,\r\n+    of: Number,\r\n+    default: {}\r\n+  },\r\n+  createdAt: {\r\n+    type: Date,\r\n+    default: Date.now\r\n+  },\r\n+  updatedAt: {\r\n+    type: Date,\r\n+    default: Date.now\r\n+  }\r\n });\r\n \r\n const Chat = mongoose.models.Chat || mongoose.model('Chat', chatSchema);\r\n \r\n"
+                },
+                {
+                    "date": 1731391415440,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -0,0 +1,31 @@\n+import mongoose from 'mongoose';\r\n+\r\n+const chatSchema = new mongoose.Schema({\r\n+  participants: {\r\n+    type: [mongoose.Schema.Types.ObjectId],\r\n+    ref: 'User',  // Referencia al modelo de 'User', los participantes del chat\r\n+    required: true\r\n+  },\r\n+  lastMessage: {\r\n+    type: mongoose.Schema.Types.ObjectId,\r\n+    ref: 'Message',  // Referencia al último mensaje\r\n+  },\r\n+  unreadMessages: {\r\n+    type: Map,\r\n+    of: Number,\r\n+    default: {}\r\n+  },\r\n+  createdAt: {\r\n+    type: Date,\r\n+    default: Date.now  // Fecha de creación del chat\r\n+  },\r\n+  updatedAt: {\r\n+    type: Date,\r\n+    default: Date.now  // Fecha de la última actualización\r\n+  }\r\n+});\r\n+\r\n+// Asegura que el modelo no sea redefinido si ya existe\r\n+const Chat = mongoose.models.Chat || mongoose.model('Chat', chatSchema);\r\n+\r\n+export default Chat;\r\n"
+                },
+                {
+                    "date": 1731393353187,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -1,12 +1,18 @@\n import mongoose from 'mongoose';\r\n \r\n const chatSchema = new mongoose.Schema({\r\n-  participants: {\r\n-    type: [mongoose.Schema.Types.ObjectId],\r\n-    ref: 'User',  // Referencia al modelo de 'User', los participantes del chat\r\n-    required: true\r\n-  },\r\n+  participants: [\r\n+    {\r\n+      type: mongoose.Schema.Types.ObjectId,\r\n+      refPath: 'participants.type',  // Permite referenciar dinámicamente 'User' o 'Charity'\r\n+      required: true\r\n+    },\r\n+    {\r\n+      type: String,  // Guarda el tipo de cada participante (puede ser 'User' o 'Charity')\r\n+      required: true\r\n+    }\r\n+  ],\r\n   lastMessage: {\r\n     type: mongoose.Schema.Types.ObjectId,\r\n     ref: 'Message',  // Referencia al último mensaje\r\n   },\r\n@@ -28,34 +34,4 @@\n // Asegura que el modelo no sea redefinido si ya existe\r\n const Chat = mongoose.models.Chat || mongoose.model('Chat', chatSchema);\r\n \r\n export default Chat;\r\n-import mongoose from 'mongoose';\r\n-\r\n-const chatSchema = new mongoose.Schema({\r\n-  participants: {\r\n-    type: [mongoose.Schema.Types.ObjectId],\r\n-    ref: 'User',\r\n-    required: true\r\n-  },\r\n-  lastMessage: {\r\n-    type: mongoose.Schema.Types.ObjectId,\r\n-    ref: 'Message'\r\n-  },\r\n-  unreadMessages: {\r\n-    type: Map,\r\n-    of: Number,\r\n-    default: {}\r\n-  },\r\n-  createdAt: {\r\n-    type: Date,\r\n-    default: Date.now\r\n-  },\r\n-  updatedAt: {\r\n-    type: Date,\r\n-    default: Date.now\r\n-  }\r\n-});\r\n-\r\n-const Chat = mongoose.models.Chat || mongoose.model('Chat', chatSchema);\r\n-\r\n-export default Chat;\n\\ No newline at end of file\n"
+                },
+                {
+                    "date": 1731393901646,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -1,21 +1,17 @@\n import mongoose from 'mongoose';\r\n \r\n-const chatSchema = new mongoose.Schema({\r\n-  participants: [\r\n-    {\r\n-      type: mongoose.Schema.Types.ObjectId,\r\n-      refPath: 'participants.type',  // Permite referenciar dinámicamente 'User' o 'Charity'\r\n-      required: true\r\n-    },\r\n-    {\r\n-      type: String,  // Guarda el tipo de cada participante (puede ser 'User' o 'Charity')\r\n-      required: true\r\n-    }\r\n-  ],\r\n+const { Schema } = mongoose;\r\n+\r\n+const chatSchema = new Schema({\r\n+  participants: [{\r\n+    type: mongoose.Schema.Types.ObjectId, \r\n+    refPath: 'participants.type',  // Indica que el tipo de referencia dependerá del campo `type`\r\n+    required: true\r\n+  }],\r\n   lastMessage: {\r\n     type: mongoose.Schema.Types.ObjectId,\r\n-    ref: 'Message',  // Referencia al último mensaje\r\n+    ref: 'Message'  // Referencia al último mensaje\r\n   },\r\n   unreadMessages: {\r\n     type: Map,\r\n     of: Number,\r\n@@ -27,11 +23,14 @@\n   },\r\n   updatedAt: {\r\n     type: Date,\r\n     default: Date.now  // Fecha de la última actualización\r\n+  },\r\n+  participantsType: {  // Añadir este campo para almacenar los tipos de los participantes\r\n+    type: [String],  // Puede ser 'User' o 'Charity'\r\n+    required: true\r\n   }\r\n });\r\n \r\n-// Asegura que el modelo no sea redefinido si ya existe\r\n const Chat = mongoose.models.Chat || mongoose.model('Chat', chatSchema);\r\n \r\n export default Chat;\r\n"
+                }
+            ],
+            "date": 1731384884316,
+            "name": "Commit-0",
+            "content": "const mongoose = require('mongoose');\r\n\r\nconst chatSchema = new mongoose.Schema({\r\n  participants: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],\r\n  lastMessage: { type: mongoose.Schema.Types.ObjectId, ref: 'Message' },\r\n  unreadMessages: { type: Map, of: Number },\r\n}, { timestamps: true });\r\n\r\nconst Chat = mongoose.model('Chat', chatSchema);\r\n\r\nmodule.exports = Chat;"
+        }
+    ]
+}

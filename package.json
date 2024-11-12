@@ -87,6 +87,7 @@
     "setprototypeof": "^1.2.0",
     "side-channel": "^1.0.6",
     "sift": "^17.1.3",
+    "socket.io": "^4.8.1",
     "soket.io": "^0.0.1-security",
     "sparse-bitfield": "^3.0.3",
     "statuses": "^2.0.1",

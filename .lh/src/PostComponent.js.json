@@ -1,0 +1,30 @@
+{
+    "sourceFile": "src/PostComponent.js",
+    "activeCommit": 0,
+    "commits": [
+        {
+            "activePatchIndex": 3,
+            "patches": [
+                {
+                    "date": 1731023529353,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n"
+                },
+                {
+                    "date": 1731024135262,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -6,9 +6,9 @@\n     const [posts, setPosts] = useState([]);\r\n \r\n     useEffect(() => {\r\n         const fetchPosts = async () => {\r\n-            const response = await axios.get('http://localhost:3000/posts');\r\n+            const response = await axios.get('http://localhost:3002/posts');\r\n             setPosts(response.data);\r\n         };\r\n \r\n         fetchPosts();\r\n"
+                },
+                {
+                    "date": 1731024140487,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -14,18 +14,18 @@\n         fetchPosts();\r\n     }, []);\r\n \r\n     const createPost = async () => {\r\n-        const response = await axios.post('http://localhost:3000/posts', {\r\n+        const response = await axios.post('http://localhost:3002/posts', {\r\n             content,\r\n             organization: organizationId,\r\n         });\r\n         setPosts((prevPosts) => [...prevPosts, response.data]);\r\n         setContent('');\r\n     };\r\n \r\n     const likePost = async (postId) => {\r\n-        const response = await axios.post(`http://localhost:3000/posts/${postId}/like`, {\r\n+        const response = await axios.post(`http://localhost:3002/posts/${postId}/like`, {\r\n             userId,\r\n         });\r\n         setPosts((prevPosts) =>\r\n             prevPosts.map((post) =>\r\n"
+                },
+                {
+                    "date": 1731025564398,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -6,9 +6,9 @@\n     const [posts, setPosts] = useState([]);\r\n \r\n     useEffect(() => {\r\n         const fetchPosts = async () => {\r\n-            const response = await axios.get('http://localhost:3002/posts');\r\n+            const response = await axios.get('http://localhost:3001/posts');\r\n             setPosts(response.data);\r\n         };\r\n \r\n         fetchPosts();\r\n"
+                }
+            ],
+            "date": 1731023529353,
+            "name": "Commit-0",
+            "content": "import React, { useState, useEffect } from 'react';\r\nimport axios from 'axios';\r\n\r\nconst PostComponent = ({ organizationId, userId }) => {\r\n    const [content, setContent] = useState('');\r\n    const [posts, setPosts] = useState([]);\r\n\r\n    useEffect(() => {\r\n        const fetchPosts = async () => {\r\n            const response = await axios.get('http://localhost:3000/posts');\r\n            setPosts(response.data);\r\n        };\r\n\r\n        fetchPosts();\r\n    }, []);\r\n\r\n    const createPost = async () => {\r\n        const response = await axios.post('http://localhost:3000/posts', {\r\n            content,\r\n            organization: organizationId,\r\n        });\r\n        setPosts((prevPosts) => [...prevPosts, response.data]);\r\n        setContent('');\r\n    };\r\n\r\n    const likePost = async (postId) => {\r\n        const response = await axios.post(`http://localhost:3000/posts/${postId}/like`, {\r\n            userId,\r\n        });\r\n        setPosts((prevPosts) =>\r\n            prevPosts.map((post) =>\r\n                post._id === postId ? { ...post, likes: response.data.likes } : post\r\n            )\r\n        );\r\n    };\r\n\r\n    return (\r\n        <div>\r\n            <div>\r\n                <input\r\n                    type=\"text\"\r\n                    value={content}\r\n                    onChange={(e) => setContent(e.target.value)}\r\n                />\r\n                <button onClick={createPost}>Publicar</button>\r\n            </div>\r\n            <div>\r\n                {posts.map((post) => (\r\n                    <div key={post._id}>\r\n                        <p>{post.content}</p>\r\n                        <button onClick={() => likePost(post._id)}>\r\n                            Like ({post.likes.length})\r\n                        </button>\r\n                    </div>\r\n                ))}\r\n            </div>\r\n        </div>\r\n    );\r\n};\r\n\r\nexport default PostComponent;\r\n"
+        }
+    ]
+}

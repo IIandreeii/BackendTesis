@@ -1,0 +1,18 @@
+{
+    "sourceFile": "src/routes/posts.js",
+    "activeCommit": 0,
+    "commits": [
+        {
+            "activePatchIndex": 0,
+            "patches": [
+                {
+                    "date": 1731016519103,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n"
+                }
+            ],
+            "date": 1731016519103,
+            "name": "Commit-0",
+            "content": "import express from 'express';\r\nimport Post from '../models/Post.js';\r\n\r\nconst router = express.Router();\r\n\r\n// Ruta para obtener todas las publicaciones\r\nrouter.get('/', async (req, res) => {\r\n    try {\r\n        const posts = await Post.find().populate('organization').populate('likes');\r\n        res.json(posts);\r\n    } catch (err) {\r\n        res.status(500).json({ message: err.message });\r\n    }\r\n});\r\n\r\n// Ruta para crear una nueva publicación\r\nrouter.post('/', async (req, res) => {\r\n    const post = new Post({\r\n        content: req.body.content,\r\n        organization: req.body.organization,\r\n    });\r\n\r\n    try {\r\n        const newPost = await post.save();\r\n        res.status(201).json(newPost);\r\n    } catch (err) {\r\n        res.status(400).json({ message: err.message });\r\n    }\r\n});\r\n\r\n// Ruta para dar \"like\" a una publicación\r\nrouter.post('/:id/like', async (req, res) => {\r\n    try {\r\n        const post = await Post.findById(req.params.id);\r\n        if (!post) {\r\n            return res.status(404).json({ message: 'Publicación no encontrada' });\r\n        }\r\n\r\n        if (!post.likes.includes(req.body.userId)) {\r\n            post.likes.push(req.body.userId);\r\n            await post.save();\r\n        }\r\n\r\n        res.json(post);\r\n    } catch (err) {\r\n        res.status(500).json({ message: err.message });\r\n    }\r\n});\r\n\r\nexport default router;\r\n"
+        }
+    ]
+}

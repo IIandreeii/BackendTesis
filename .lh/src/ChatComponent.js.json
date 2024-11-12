@@ -1,0 +1,26 @@
+{
+    "sourceFile": "src/ChatComponent.js",
+    "activeCommit": 0,
+    "commits": [
+        {
+            "activePatchIndex": 2,
+            "patches": [
+                {
+                    "date": 1731023529353,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n"
+                },
+                {
+                    "date": 1731024148304,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -1,8 +1,8 @@\n import React, { useState, useEffect } from 'react';\r\n import { io } from 'socket.io-client';\r\n \r\n-const socket = io('http://localhost:3000');\r\n+const socket = io('http://localhost:3002');\r\n \r\n const ChatComponent = ({ userId, organizationId }) => {\r\n     const [message, setMessage] = useState('');\r\n     const [messages, setMessages] = useState([]);\r\n"
+                },
+                {
+                    "date": 1731025553525,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -1,8 +1,8 @@\n import React, { useState, useEffect } from 'react';\r\n import { io } from 'socket.io-client';\r\n \r\n-const socket = io('http://localhost:3002');\r\n+const socket = io('http://localhost:3001');\r\n \r\n const ChatComponent = ({ userId, organizationId }) => {\r\n     const [message, setMessage] = useState('');\r\n     const [messages, setMessages] = useState([]);\r\n"
+                }
+            ],
+            "date": 1731023529353,
+            "name": "Commit-0",
+            "content": "import React, { useState, useEffect } from 'react';\r\nimport { io } from 'socket.io-client';\r\n\r\nconst socket = io('http://localhost:3000');\r\n\r\nconst ChatComponent = ({ userId, organizationId }) => {\r\n    const [message, setMessage] = useState('');\r\n    const [messages, setMessages] = useState([]);\r\n\r\n    useEffect(() => {\r\n        socket.emit('joinRoom', { userId, organizationId });\r\n\r\n        socket.on('receiveMessage', (msg) => {\r\n            setMessages((prevMessages) => [...prevMessages, msg]);\r\n        });\r\n\r\n        return () => {\r\n            socket.off('receiveMessage');\r\n        };\r\n    }, [userId, organizationId]);\r\n\r\n    const sendMessage = () => {\r\n        socket.emit('sendMessage', { userId, organizationId, message });\r\n        setMessage('');\r\n    };\r\n\r\n    return (\r\n        <div>\r\n            <div>\r\n                {messages.map((msg, index) => (\r\n                    <div key={index}>{msg.message}</div>\r\n                ))}\r\n            </div>\r\n            <input\r\n                type=\"text\"\r\n                value={message}\r\n                onChange={(e) => setMessage(e.target.value)}\r\n            />\r\n            <button onClick={sendMessage}>Enviar</button>\r\n        </div>\r\n    );\r\n};\r\n\r\nexport default ChatComponent;\r\n"
+        }
+    ]
+}
