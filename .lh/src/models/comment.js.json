@@ -1,0 +1,34 @@
+{
+    "sourceFile": "src/models/comment.js",
+    "activeCommit": 0,
+    "commits": [
+        {
+            "activePatchIndex": 4,
+            "patches": [
+                {
+                    "date": 1731812807687,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n"
+                },
+                {
+                    "date": 1731812888027,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -0,0 +1,31 @@\n+// FILE: src/models/comment.js\r\n+import mongoose from 'mongoose';\r\n+\r\n+const { Schema } = mongoose;\r\n+\r\n+const commentSchema = new Schema({\r\n+    user: {\r\n+        type: Schema.Types.ObjectId,\r\n+        ref: 'User',\r\n+        required: true\r\n+    },\r\n+    publication: {\r\n+        type: Schema.Types.ObjectId,\r\n+        ref: 'Publication',\r\n+        required: true\r\n+    },\r\n+    comment: {\r\n+        type: String,\r\n+        required: true\r\n+    },\r\n+    createdAt: {\r\n+        type: Date,\r\n+        default: Date.now\r\n+    }\r\n+}, {\r\n+    timestamps: true\r\n+});\r\n+\r\n+const Comment = mongoose.model('Comment', commentSchema);\r\n+\r\n+export default Comment;\n\\ No newline at end of file\n"
+                },
+                {
+                    "date": 1731812907654,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -27,36 +27,5 @@\n });\r\n \r\n const Comment = mongoose.model('Comment', commentSchema);\r\n \r\n-export default Comment;\n-// FILE: src/models/comment.js\r\n-import mongoose from 'mongoose';\r\n-\r\n-const { Schema } = mongoose;\r\n-\r\n-const commentSchema = new Schema({\r\n-    user: {\r\n-        type: Schema.Types.ObjectId,\r\n-        ref: 'User',\r\n-        required: true\r\n-    },\r\n-    publication: {\r\n-        type: Schema.Types.ObjectId,\r\n-        ref: 'Publication',\r\n-        required: true\r\n-    },\r\n-    comment: {\r\n-        type: String,\r\n-        required: true\r\n-    },\r\n-    createdAt: {\r\n-        type: Date,\r\n-        default: Date.now\r\n-    }\r\n-}, {\r\n-    timestamps: true\r\n-});\r\n-\r\n-const Comment = mongoose.model('Comment', commentSchema);\r\n-\r\n export default Comment;\n\\ No newline at end of file\n"
+                },
+                {
+                    "date": 1731829660699,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -6,10 +6,15 @@\n const commentSchema = new Schema({\r\n     user: {\r\n         type: Schema.Types.ObjectId,\r\n         ref: 'User',\r\n-        required: true\r\n+        required: false\r\n     },\r\n+    charity: {\r\n+        type: Schema.Types.ObjectId,\r\n+        ref: 'Charity',\r\n+        required: false\r\n+    },\r\n     publication: {\r\n         type: Schema.Types.ObjectId,\r\n         ref: 'Publication',\r\n         required: true\r\n"
+                },
+                {
+                    "date": 1731830934514,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -0,0 +1,36 @@\n+// FILE: src/models/comment.js\r\n+import mongoose from 'mongoose';\r\n+\r\n+const { Schema } = mongoose;\r\n+\r\n+const commentSchema = new Schema({\r\n+    user: {\r\n+        type: Schema.Types.ObjectId,\r\n+        ref: 'User',\r\n+        required: function() { return !this.charity; } // Obligatorio si no hay charity\r\n+    },\r\n+    charity: {\r\n+        type: Schema.Types.ObjectId,\r\n+        ref: 'Charity',\r\n+        required: function() { return !this.user; } // Obligatorio si no hay user\r\n+    },\r\n+    publication: {\r\n+        type: Schema.Types.ObjectId,\r\n+        ref: 'Publication',\r\n+        required: true\r\n+    },\r\n+    comment: {\r\n+        type: String,\r\n+        required: true\r\n+    },\r\n+    createdAt: {\r\n+        type: Date,\r\n+        default: Date.now\r\n+    }\r\n+}, {\r\n+    timestamps: true\r\n+});\r\n+\r\n+const Comment = mongoose.model('Comment', commentSchema);\r\n+\r\n+export default Comment;\n\\ No newline at end of file\n"
+                }
+            ],
+            "date": 1731812807687,
+            "name": "Commit-0",
+            "content": "// FILE: src/models/comment.js\r\nimport mongoose from 'mongoose';\r\n\r\nconst { Schema } = mongoose;\r\n\r\nconst commentSchema = new Schema({\r\n    user: {\r\n        type: Schema.Types.ObjectId,\r\n        ref: 'User',\r\n        required: true\r\n    },\r\n    publication: {\r\n        type: Schema.Types.ObjectId,\r\n        ref: 'Publication',\r\n        required: true\r\n    },\r\n    comment: {\r\n        type: String,\r\n        required: true\r\n    },\r\n    createdAt: {\r\n        type: Date,\r\n        default: Date.now\r\n    }\r\n}, {\r\n    timestamps: true\r\n});\r\n\r\nconst Comment = mongoose.model('Comment', commentSchema);\r\n\r\nexport default Comment;"
+        }
+    ]
+}

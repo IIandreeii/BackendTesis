@@ -1,0 +1,42 @@
+{
+    "sourceFile": "src/services/multerconfig.js",
+    "activeCommit": 0,
+    "commits": [
+        {
+            "activePatchIndex": 6,
+            "patches": [
+                {
+                    "date": 1731813852970,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n"
+                },
+                {
+                    "date": 1731814040791,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -0,0 +1,16 @@\n+// FILE: src/config/multerConfig.js\r\n+const multer = require('multer');\r\n+const path = require('path');\r\n+\r\n+const storage = multer.diskStorage({\r\n+    destination: function(req, file, cb) {\r\n+        cb(null, path.join(__dirname, '..', 'public', 'imagenes'));\r\n+    },\r\n+    filename: function(req, file, cb) {\r\n+        cb(null, `image${Date.now()}.${file.mimetype.split('/')[1]}`);\r\n+    }\r\n+});\r\n+\r\n+const upload = multer({ storage });\r\n+\r\n+module.exports = upload;\n\\ No newline at end of file\n"
+                },
+                {
+                    "date": 1731814297404,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -11,39 +11,5 @@\n     }\r\n });\r\n \r\n const upload = multer({ storage });\r\n-\r\n-module.exports = upload;\n-import multer from 'multer';\r\n-import path from 'path';\r\n-\r\n-// Configuración de almacenamiento\r\n-const storage = multer.diskStorage({\r\n-    destination: (req, file, cb) => {\r\n-        cb(null, 'uploads/');\r\n-    },\r\n-    filename: (req, file, cb) => {\r\n-        cb(null, `${Date.now()}-${file.originalname}`);\r\n-    }\r\n-});\r\n-\r\n-// Filtro de archivos para aceptar solo imágenes\r\n-const fileFilter = (req, file, cb) => {\r\n-    const fileTypes = /jpeg|jpg|png|gif/;\r\n-    const extname = fileTypes.test(path.extname(file.originalname).toLowerCase());\r\n-    const mimetype = fileTypes.test(file.mimetype);\r\n-\r\n-    if (extname && mimetype) {\r\n-        return cb(null, true);\r\n-    } else {\r\n-        cb('Error: Solo se permiten imágenes');\r\n-    }\r\n-};\r\n-\r\n-const upload = multer({\r\n-    storage: storage,\r\n-    limits: { fileSize: 1024 * 1024 * 5 }, // Limite de 5MB\r\n-    fileFilter: fileFilter\r\n-});\r\n-\r\n export default upload;\n\\ No newline at end of file\n"
+                },
+                {
+                    "date": 1731814314054,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -1,7 +1,7 @@\n // FILE: src/config/multerConfig.js\r\n const multer = require('multer');\r\n-const path = require('path');\r\n+const path = require'path';\r\n \r\n const storage = multer.diskStorage({\r\n     destination: function(req, file, cb) {\r\n         cb(null, path.join(__dirname, '..', 'public', 'imagenes'));\r\n"
+                },
+                {
+                    "date": 1731814319807,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -1,7 +1,7 @@\n // FILE: src/config/multerConfig.js\r\n const multer = require('multer');\r\n-const path = require'path';\r\n+const path from 'path';\r\n \r\n const storage = multer.diskStorage({\r\n     destination: function(req, file, cb) {\r\n         cb(null, path.join(__dirname, '..', 'public', 'imagenes'));\r\n"
+                },
+                {
+                    "date": 1731814330971,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -1,7 +1,7 @@\n // FILE: src/config/multerConfig.js\r\n-const multer = require('multer');\r\n-const path from 'path';\r\n+import multer = require('multer');\r\n+import path from 'path';\r\n \r\n const storage = multer.diskStorage({\r\n     destination: function(req, file, cb) {\r\n         cb(null, path.join(__dirname, '..', 'public', 'imagenes'));\r\n"
+                },
+                {
+                    "date": 1731814338528,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -1,6 +1,6 @@\n // FILE: src/config/multerConfig.js\r\n-import multer = require('multer');\r\n+import multer  from 'multer');\r\n import path from 'path';\r\n \r\n const storage = multer.diskStorage({\r\n     destination: function(req, file, cb) {\r\n"
+                }
+            ],
+            "date": 1731813852970,
+            "name": "Commit-0",
+            "content": "import multer from 'multer';\r\nimport path from 'path';\r\n\r\n// Configuración de almacenamiento\r\nconst storage = multer.diskStorage({\r\n    destination: (req, file, cb) => {\r\n        cb(null, 'uploads/');\r\n    },\r\n    filename: (req, file, cb) => {\r\n        cb(null, `${Date.now()}-${file.originalname}`);\r\n    }\r\n});\r\n\r\n// Filtro de archivos para aceptar solo imágenes\r\nconst fileFilter = (req, file, cb) => {\r\n    const fileTypes = /jpeg|jpg|png|gif/;\r\n    const extname = fileTypes.test(path.extname(file.originalname).toLowerCase());\r\n    const mimetype = fileTypes.test(file.mimetype);\r\n\r\n    if (extname && mimetype) {\r\n        return cb(null, true);\r\n    } else {\r\n        cb('Error: Solo se permiten imágenes');\r\n    }\r\n};\r\n\r\nconst upload = multer({\r\n    storage: storage,\r\n    limits: { fileSize: 1024 * 1024 * 5 }, // Limite de 5MB\r\n    fileFilter: fileFilter\r\n});\r\n\r\nexport default upload;"
+        }
+    ]
+}

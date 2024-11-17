@@ -1,0 +1,18 @@
+{
+    "sourceFile": "src/models/charity.js",
+    "activeCommit": 0,
+    "commits": [
+        {
+            "activePatchIndex": 0,
+            "patches": [
+                {
+                    "date": 1731811879466,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n"
+                }
+            ],
+            "date": 1731811879466,
+            "name": "Commit-0",
+            "content": "import mongoose from 'mongoose';\r\nimport bcrypt from 'bcrypt';\r\n\r\nconst { Schema } = mongoose;\r\n\r\nconst CharitySchema = new Schema({\r\n  nombre: {\r\n    type: String,\r\n    required: true\r\n  },\r\n  descripcion: {\r\n    type: String,\r\n    required: true\r\n  },\r\n  email: {\r\n    type: String,\r\n    required: true,\r\n    unique: true\r\n  },\r\n  direccion: {\r\n    type: String,\r\n    required: true,\r\n  },\r\n  telefono: {\r\n    type: String,\r\n    required: true,\r\n    unique: true\r\n  },\r\n  password: {\r\n    type: String,\r\n    required: true\r\n  },\r\n  userType: { \r\n    type: String, \r\n    required: true \r\n  },\r\n  accessToken: {\r\n    type: String,\r\n    required: false \r\n  },\r\n  refreshToken: {  // Campo para almacenar el refresh_token\r\n    type: String,\r\n    required: false \r\n  },\r\n  tokenExpiration: { // Campo para almacenar el tiempo de expiración\r\n    type: Number,\r\n    required: false \r\n  }\r\n}, {\r\n  timestamps: true\r\n});\r\n\r\n// Hash de la contraseña antes de guardar\r\nCharitySchema.pre(\"save\", async function(next) {\r\n  if (this.isModified('password')) { // Solo hacer hash si la contraseña ha sido modificada\r\n    const hash = await bcrypt.hash(this.password, 10);\r\n    this.password = hash;\r\n  }\r\n  next();\r\n});\r\n\r\n// Método para validar la contraseña\r\nCharitySchema.methods.isValidPassword = async function(password) {\r\n  const charity = this;\r\n  const compare = await bcrypt.compare(password, charity.password);\r\n  return compare;\r\n};\r\n\r\n// Método para actualizar tokens\r\nCharitySchema.methods.updateTokens = async function(accessToken, refreshToken, expirationTime) {\r\n  this.accessToken = accessToken;\r\n  this.refreshToken = refreshToken;\r\n  this.tokenExpiration = expirationTime; // Establecer tiempo de expiración\r\n  await this.save(); // Guardar los cambios\r\n};\r\n\r\n// Método para obtener tokens desencriptados (aquí puedes agregar lógica de desencriptación)\r\nCharitySchema.methods.getDecryptedTokens = function() {\r\n  return {\r\n    accessToken: this.accessToken, // Aquí puedes desencriptar si es necesario\r\n    refreshToken: this.refreshToken // Aquí puedes desencriptar si es necesario\r\n  };\r\n};\r\n\r\nexport default mongoose.model(\"Charity\", CharitySchema);\r\n"
+        }
+    ]
+}

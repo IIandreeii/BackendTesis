@@ -1,0 +1,38 @@
+{
+    "sourceFile": "src/models/publication.js",
+    "activeCommit": 0,
+    "commits": [
+        {
+            "activePatchIndex": 5,
+            "patches": [
+                {
+                    "date": 1731812785399,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n"
+                },
+                {
+                    "date": 1731812876740,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -1,46 +1,31 @@\n-// FILE: src/models/publication.js\r\n+// FILE: src/models/comment.js\r\n import mongoose from 'mongoose';\r\n \r\n const { Schema } = mongoose;\r\n \r\n-const publicationSchema = new Schema({\r\n-    title: {\r\n-        type: String,\r\n+const commentSchema = new Schema({\r\n+    user: {\r\n+        type: Schema.Types.ObjectId,\r\n+        ref: 'User',\r\n         required: true\r\n     },\r\n-    description: {\r\n-        type: String,\r\n+    publication: {\r\n+        type: Schema.Types.ObjectId,\r\n+        ref: 'Publication',\r\n         required: true\r\n     },\r\n-    imageUrl: {\r\n+    comment: {\r\n         type: String,\r\n-        required: false\r\n-    },\r\n-    location: {\r\n-        type: String,\r\n-        required: false\r\n-    },\r\n-    date: {\r\n-        type: Date,\r\n         required: true\r\n     },\r\n-    likes: {\r\n-        type: Number,\r\n-        default: 0\r\n-    },\r\n-    user: {\r\n-        type: Schema.Types.ObjectId,\r\n-        ref: 'User',\r\n-        required: true\r\n-    },\r\n     createdAt: {\r\n         type: Date,\r\n\\ No newline at end of file\n         default: Date.now\r\n     }\r\n }, {\r\n     timestamps: true\r\n });\r\n \r\n-const Publication = mongoose.model('Publication', publicationSchema);\r\n+const Comment = mongoose.model('Comment', commentSchema);\r\n \r\n-export default Publication;\n+export default Comment;\n\\ No newline at end of file\n"
+                },
+                {
+                    "date": 1731812898877,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -1,31 +1,46 @@\n-// FILE: src/models/comment.js\r\n+// FILE: src/models/publication.js\r\n import mongoose from 'mongoose';\r\n \r\n const { Schema } = mongoose;\r\n \r\n-const commentSchema = new Schema({\r\n-    user: {\r\n-        type: Schema.Types.ObjectId,\r\n-        ref: 'User',\r\n+const publicationSchema = new Schema({\r\n+    title: {\r\n+        type: String,\r\n         required: true\r\n     },\r\n-    publication: {\r\n-        type: Schema.Types.ObjectId,\r\n-        ref: 'Publication',\r\n+    description: {\r\n+        type: String,\r\n         required: true\r\n     },\r\n-    comment: {\r\n+    imageUrl: {\r\n         type: String,\r\n+        required: false\r\n+    },\r\n+    location: {\r\n+        type: String,\r\n+        required: false\r\n+    },\r\n\\ No newline at end of file\n+    date: {\r\n+        type: Date,\r\n         required: true\r\n     },\r\n+    likes: {\r\n+        type: Number,\r\n+        default: 0\r\n+    },\r\n+    charity: {\r\n+        type: Schema.Types.ObjectId,\r\n+        ref: 'Charity',\r\n+        required: true\r\n+    },\r\n     createdAt: {\r\n         type: Date,\r\n         default: Date.now\r\n     }\r\n }, {\r\n     timestamps: true\r\n });\r\n \r\n-const Comment = mongoose.model('Comment', commentSchema);\r\n+const Publication = mongoose.model('Publication', publicationSchema);\r\n \r\n-export default Comment;\n+export default Publication;\n\\ No newline at end of file\n"
+                },
+                {
+                    "date": 1731825210834,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -1,5 +1,4 @@\n-// FILE: src/models/publication.js\r\n import mongoose from 'mongoose';\r\n \r\n const { Schema } = mongoose;\r\n \r\n@@ -32,8 +31,12 @@\n         type: Schema.Types.ObjectId,\r\n         ref: 'Charity',\r\n         required: true\r\n     },\r\n+    comments: [{\r\n+        type: Schema.Types.ObjectId,\r\n+        ref: 'Comment'\r\n+    }],\r\n     createdAt: {\r\n         type: Date,\r\n         default: Date.now\r\n     }\r\n"
+                },
+                {
+                    "date": 1731827808761,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -22,12 +22,12 @@\n     date: {\r\n         type: Date,\r\n         required: true\r\n     },\r\n-    likes: {\r\n-        type: Number,\r\n-        default: 0\r\n-    },\r\n+    likes: [{\r\n+        type: Schema.Types.ObjectId,\r\n+        ref: 'User'\r\n+    }],\r\n     charity: {\r\n         type: Schema.Types.ObjectId,\r\n         ref: 'Charity',\r\n         required: true\r\n"
+                },
+                {
+                    "date": 1731829666997,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -1,4 +1,5 @@\n+// FILE: src/models/publication.js\r\n import mongoose from 'mongoose';\r\n \r\n const { Schema } = mongoose;\r\n \r\n@@ -10,37 +11,41 @@\n     description: {\r\n         type: String,\r\n         required: true\r\n     },\r\n-    imageUrl: {\r\n-        type: String,\r\n-        required: false\r\n+    date: {\r\n+        type: Date,\r\n+        required: true\r\n     },\r\n     location: {\r\n         type: String,\r\n-        required: false\r\n+        required: true\r\n     },\r\n-    date: {\r\n-        type: Date,\r\n+    imageUrl: {\r\n+        type: String,\r\n         required: true\r\n     },\r\n-    likes: [{\r\n-        type: Schema.Types.ObjectId,\r\n-        ref: 'User'\r\n-    }],\r\n     charity: {\r\n         type: Schema.Types.ObjectId,\r\n         ref: 'Charity',\r\n         required: true\r\n     },\r\n+    likes: [{\r\n+        user: {\r\n+            type: Schema.Types.ObjectId,\r\n+            ref: 'User',\r\n+            required: false\r\n+        },\r\n+        charity: {\r\n+            type: Schema.Types.ObjectId,\r\n+            ref: 'Charity',\r\n+            required: false\r\n+        }\r\n+    }],\r\n     comments: [{\r\n         type: Schema.Types.ObjectId,\r\n         ref: 'Comment'\r\n-    }],\r\n-    createdAt: {\r\n-        type: Date,\r\n-        default: Date.now\r\n-    }\r\n+    }]\r\n }, {\r\n     timestamps: true\r\n });\r\n \r\n"
+                }
+            ],
+            "date": 1731812785399,
+            "name": "Commit-0",
+            "content": "// FILE: src/models/publication.js\r\nimport mongoose from 'mongoose';\r\n\r\nconst { Schema } = mongoose;\r\n\r\nconst publicationSchema = new Schema({\r\n    title: {\r\n        type: String,\r\n        required: true\r\n    },\r\n    description: {\r\n        type: String,\r\n        required: true\r\n    },\r\n    imageUrl: {\r\n        type: String,\r\n        required: false\r\n    },\r\n    location: {\r\n        type: String,\r\n        required: false\r\n    },\r\n    date: {\r\n        type: Date,\r\n        required: true\r\n    },\r\n    likes: {\r\n        type: Number,\r\n        default: 0\r\n    },\r\n    user: {\r\n        type: Schema.Types.ObjectId,\r\n        ref: 'User',\r\n        required: true\r\n    },\r\n    createdAt: {\r\n        type: Date,\r\n        default: Date.now\r\n    }\r\n}, {\r\n    timestamps: true\r\n});\r\n\r\nconst Publication = mongoose.model('Publication', publicationSchema);\r\n\r\nexport default Publication;"
+        }
+    ]
+}
