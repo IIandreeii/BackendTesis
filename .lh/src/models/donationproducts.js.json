@@ -1,0 +1,18 @@
+{
+    "sourceFile": "src/models/donationproducts.js",
+    "activeCommit": 0,
+    "commits": [
+        {
+            "activePatchIndex": 0,
+            "patches": [
+                {
+                    "date": 1731950387188,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n"
+                }
+            ],
+            "date": 1731950387188,
+            "name": "Commit-0",
+            "content": "import mongoose from 'mongoose';\r\n\r\nconst donationInKindSchema = new mongoose.Schema({\r\n    charityId: { type: mongoose.Schema.Types.ObjectId, ref: 'Charity', required: true },\r\n    donorName: { type: String, required: true },\r\n    itemType: { type: String, required: true },\r\n    quantity: { type: Number, required: true },\r\n    unit: { type: String, required: true },\r\n    valuePerUnit: { type: Number, required: true },\r\n    createdAt: { type: Date, default: Date.now }\r\n});\r\n\r\nconst DonationInKind = mongoose.model('DonationInKind', donationInKindSchema);\r\n\r\nexport default DonationInKind;"
+        }
+    ]
+}

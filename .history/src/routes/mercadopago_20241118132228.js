@@ -268,7 +268,7 @@ router.post('/mercadopago/donations/in-kind', async (req, res) => {
     }
 });
 
-
+// Ruta para generar el reporte de donaciones en especie
 router.get('/mercadopago/report/in-kind/:charityId', async (req, res) => {
     const { charityId } = req.params;
     if (!mongoose.isValidObjectId(charityId)) {

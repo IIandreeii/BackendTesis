@@ -5,7 +5,6 @@ import mongoose from 'mongoose';
 import Donation from '../models/donation.js';
 import { generateReport } from '../services/reportesdonaciones.js';
 import donationproducts from '../models/donationproducts.js';
-import { generateExcelReport } from '../services/reportescomida.js';
 
 const router = express.Router();
 
@@ -268,7 +267,7 @@ router.post('/mercadopago/donations/in-kind', async (req, res) => {
     }
 });
 
-
+// Ruta para generar el reporte de donaciones en especie
 router.get('/mercadopago/report/in-kind/:charityId', async (req, res) => {
     const { charityId } = req.params;
     if (!mongoose.isValidObjectId(charityId)) {

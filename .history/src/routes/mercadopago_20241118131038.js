@@ -5,7 +5,6 @@ import mongoose from 'mongoose';
 import Donation from '../models/donation.js';
 import { generateReport } from '../services/reportesdonaciones.js';
 import donationproducts from '../models/donationproducts.js';
-import { generateExcelReport } from '../services/reportescomida.js';
 
 const router = express.Router();
 
@@ -268,7 +267,7 @@ router.post('/mercadopago/donations/in-kind', async (req, res) => {
     }
 });
 
-
+// Ruta para generar el reporte de donaciones en especie
 router.get('/mercadopago/report/in-kind/:charityId', async (req, res) => {
     const { charityId } = req.params;
     if (!mongoose.isValidObjectId(charityId)) {
@@ -305,29 +304,90 @@ router.get('/mercadopago/report/in-kind/:charityId', async (req, res) => {
 
 
 
-router.get('/mercadopago/report/in-kind/excel/weekly/:charityId', async (req, res) => {
+
+router.get('/mercadopago/report/in-kind/excel/:charityId', async (req, res) => {
     const { charityId } = req.params;
     if (!mongoose.isValidObjectId(charityId)) {
         return res.status(400).json({ message: 'ID de organización benéfica no válido' });
     }
-    await generateExcelReport(charityId, 'weekly', res);
+
+    try {
+        const donationsInKind = await donationproducts.find({ charityId: charityId });
+
+        if (!donationsInKind.length) {
+            return res.status(404).json({ message: 'No se encontraron donaciones en especie para esta organización benéfica' });
+        }
+
+        // Crear un nuevo libro de Excel
+        const workbook = new ExcelJS.Workbook();
+        const worksheet = workbook.addWorksheet('Reporte de Donaciones en Especie');
+
+        // Añadir título
+        worksheet.mergeCells('A1:F1');
+        const titleRow = worksheet.getCell('A1');
+        titleRow.value = `Reporte de Donaciones en Especie`;
+        titleRow.font = { size: 16, bold: true };
+        titleRow.alignment = { vertical: 'middle', horizontal: 'center' };
+
+        // Añadir encabezados con estilo
+        worksheet.addRow([]);
+        const headerRow = worksheet.addRow(['Donante', 'Tipo de Producto', 'Cantidad', 'Unidad', 'Valor por Unidad', 'Valor Total']);
+        headerRow.eachCell((cell, colNumber) => {
+            cell.font = { bold: true, color: { argb: 'FFFFFF' } };
+            cell.fill = {
+                type: 'pattern',
+                pattern: 'solid',
+                fgColor: { argb: '4F81BD' }
+            };
+            cell.alignment = { vertical: 'middle', horizontal: 'center' };
+        });
+
+        // Añadir filas con estilo
+        donationsInKind.forEach((donation, index) => {
+            const row = worksheet.addRow([
+                donation.donorName,
+                donation.itemType,
+                donation.quantity,
+                donation.unit,
+                donation.valuePerUnit,
+                donation.quantity * donation.valuePerUnit
+            ]);
+
+            // Alternar color de fondo para las filas
+            if (index % 2 === 0) {
+                row.eachCell({ includeEmpty: true }, (cell) => {
+                    cell.fill = {
+                        type: 'pattern',
+                        pattern: 'solid',
+                        fgColor: { argb: 'D9EAD3' }
+                    };
+                });
+            }
+
+            // Centrar el contenido de las celdas
+            row.eachCell({ includeEmpty: true }, (cell) => {
+                cell.alignment = { vertical: 'middle', horizontal: 'center' };
+            });
+        });
+
+        // Ajustar el ancho de las columnas
+        worksheet.columns.forEach(column => {
+            column.width = column.header.length < 20 ? 20 : column.header.length;
+        });
+
+        // Configurar la respuesta para enviar el archivo Excel
+        res.setHeader('Content-disposition', 'attachment; filename=reporte_donaciones_especie.xlsx');
+        res.setHeader('Content-type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+
+        // Enviar el archivo Excel
+        await workbook.xlsx.write(res);
+        res.end();
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: `Error al generar el reporte: ${error.message}` });
+    }
 });
 
-router.get('/mercadopago/report/in-kind/excel/monthly/:charityId', async (req, res) => {
-    const { charityId } = req.params;
-    if (!mongoose.isValidObjectId(charityId)) {
-        return res.status(400).json({ message: 'ID de organización benéfica no válido' });
-    }
-    await generateExcelReport(charityId, 'monthly', res);
-});
-
-router.get('/mercadopago/report/in-kind/excel/annual/:charityId', async (req, res) => {
-    const { charityId } = req.params;
-    if (!mongoose.isValidObjectId(charityId)) {
-        return res.status(400).json({ message: 'ID de organización benéfica no válido' });
-    }
-    await generateExcelReport(charityId, 'annual', res);
-});
 
 
 

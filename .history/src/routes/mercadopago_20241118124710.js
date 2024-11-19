@@ -5,7 +5,6 @@ import mongoose from 'mongoose';
 import Donation from '../models/donation.js';
 import { generateReport } from '../services/reportesdonaciones.js';
 import donationproducts from '../models/donationproducts.js';
-import { generateExcelReport } from '../services/reportescomida.js';
 
 const router = express.Router();
 
@@ -251,7 +250,7 @@ router.post('/mercadopago/donations/in-kind', async (req, res) => {
     }
 
     try {
-        const donationProduct = new donationproducts({
+        const donationInKind = new DonationInKind({
             charityId,
             donorName,
             itemType,
@@ -260,13 +259,17 @@ router.post('/mercadopago/donations/in-kind', async (req, res) => {
             valuePerUnit
         });
 
-        await donationProduct.save();
+        await donationInKind.save();
         res.status(201).json({ message: 'Donación en especie registrada exitosamente' });
     } catch (error) {
         console.error(error);
         res.status(500).json({ message: `Error al registrar la donación: ${error.message}` });
     }
 });
+
+
+
+
 
 
 router.get('/mercadopago/report/in-kind/:charityId', async (req, res) => {
@@ -276,7 +279,7 @@ router.get('/mercadopago/report/in-kind/:charityId', async (req, res) => {
     }
 
     try {
-        const donationsInKind = await donationproducts.find({ charityId: charityId });
+        const donationsInKind = await DonationInKind.find({ charityId: charityId });
 
         if (!donationsInKind.length) {
             return res.status(404).json({ message: 'No se encontraron donaciones en especie para esta organización benéfica' });
@@ -305,29 +308,9 @@ router.get('/mercadopago/report/in-kind/:charityId', async (req, res) => {
 
 
 
-router.get('/mercadopago/report/in-kind/excel/weekly/:charityId', async (req, res) => {
-    const { charityId } = req.params;
-    if (!mongoose.isValidObjectId(charityId)) {
-        return res.status(400).json({ message: 'ID de organización benéfica no válido' });
-    }
-    await generateExcelReport(charityId, 'weekly', res);
-});
 
-router.get('/mercadopago/report/in-kind/excel/monthly/:charityId', async (req, res) => {
-    const { charityId } = req.params;
-    if (!mongoose.isValidObjectId(charityId)) {
-        return res.status(400).json({ message: 'ID de organización benéfica no válido' });
-    }
-    await generateExcelReport(charityId, 'monthly', res);
-});
 
-router.get('/mercadopago/report/in-kind/excel/annual/:charityId', async (req, res) => {
-    const { charityId } = req.params;
-    if (!mongoose.isValidObjectId(charityId)) {
-        return res.status(400).json({ message: 'ID de organización benéfica no válido' });
-    }
-    await generateExcelReport(charityId, 'annual', res);
-});
+
 
 
 
