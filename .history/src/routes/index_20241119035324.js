@@ -138,7 +138,6 @@ router.get('/messages', async (req, res) => {
 
     // Responder con los mensajes encontrados
     res.json(messages);
-
   } catch (error) {
     console.error('Error fetching messages:', error);
     res.status(500).json({ error: 'Error fetching messages' });

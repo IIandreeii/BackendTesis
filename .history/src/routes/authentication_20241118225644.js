@@ -112,8 +112,7 @@ router.get('/profile', passport.authenticate('jwt', { session: false }), async (
                     dni: user.dni,
                     apellido: user.apellido,
                     nombre: user.nombre,
-                    role: user.role,
-                    userType: user.userType,
+                    role: user.role
                 },
                 token: req.query.secret_token
             });

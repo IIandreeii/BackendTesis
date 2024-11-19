@@ -1,0 +1,22 @@
+{
+    "sourceFile": "src/models/auditorias.js",
+    "activeCommit": 0,
+    "commits": [
+        {
+            "activePatchIndex": 1,
+            "patches": [
+                {
+                    "date": 1731986905808,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n"
+                },
+                {
+                    "date": 1731993597866,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -0,0 +1,14 @@\n+import mongoose from 'mongoose';\r\n+\r\n+const auditSchema = new mongoose.Schema({\r\n+    action: { type: String, required: true }, // 'create', 'edit', 'delete', 'login', 'report'\r\n+    charityId: { type: mongoose.Schema.Types.ObjectId, ref: 'Charity', required: false },\r\n+    donationId: { type: mongoose.Schema.Types.ObjectId, ref: 'DonationProducts', required: false },\r\n+    userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: false },\r\n+    timestamp: { type: Date, default: Date.now },\r\n+    details: { type: Object, required: true }\r\n+});\r\n+\r\n+const Audit = mongoose.model('Audit', auditSchema);\r\n+\r\n+export default Audit;\n\\ No newline at end of file\n"
+                }
+            ],
+            "date": 1731986905808,
+            "name": "Commit-0",
+            "content": "import mongoose from 'mongoose';\r\n\r\nconst auditSchema = new mongoose.Schema({\r\n    action: { type: String, required: true }, // 'create', 'edit', 'delete', 'login', 'report'\r\n    charityId: { type: mongoose.Schema.Types.ObjectId, ref: 'Charity', required: false },\r\n    userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: false },\r\n    timestamp: { type: Date, default: Date.now },\r\n    details: { type: Object, required: true }\r\n});\r\n\r\nconst Audit = mongoose.model('Audit', auditSchema);\r\n\r\nexport default Audit;"
+        }
+    ]
+}

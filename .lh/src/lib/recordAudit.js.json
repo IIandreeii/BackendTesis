@@ -1,0 +1,30 @@
+{
+    "sourceFile": "src/lib/recordAudit.js",
+    "activeCommit": 0,
+    "commits": [
+        {
+            "activePatchIndex": 3,
+            "patches": [
+                {
+                    "date": 1731986993797,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n"
+                },
+                {
+                    "date": 1731988107435,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -1,5 +1,5 @@\n-import Audit from '../models/audit.js';\r\n+import Audit from '../models';\r\n \r\n const recordAudit = async (action, charityId, userId, details) => {\r\n     const audit = new Audit({\r\n         action,\r\n"
+                },
+                {
+                    "date": 1731988674387,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -0,0 +1,14 @@\n+import Audit from '../models/auditorias.js';\r\n+\r\n+const recordAudit = async (action, charityId, donationId, userId, details) => {\r\n+    const audit = new Audit({\r\n+        action,\r\n+        charityId,\r\n+        donationId,\r\n+        userId,\r\n+        details: details || {} // Asegúrate de que details siempre sea un objeto\r\n+    });\r\n+    await audit.save();\r\n+};\r\n+\r\n+export default recordAudit;\n\\ No newline at end of file\n"
+                },
+                {
+                    "date": 1731993588526,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -0,0 +1,14 @@\n+import Audit from '../models/auditorias.js';\r\n+\r\n+const recordAudit = async (action, charityId, donationId, userId, details) => {\r\n+    const audit = new Audit({\r\n+        action,\r\n+        charityId,\r\n+        donationId,\r\n+        userId,\r\n+        details: details || {} // Asegúrate de que details siempre sea un objeto\r\n+    });\r\n+    await audit.save();\r\n+};\r\n+\r\n+export default recordAudit;\n\\ No newline at end of file\n"
+                }
+            ],
+            "date": 1731986993797,
+            "name": "Commit-0",
+            "content": "import Audit from '../models/audit.js';\r\n\r\nconst recordAudit = async (action, charityId, userId, details) => {\r\n    const audit = new Audit({\r\n        action,\r\n        charityId,\r\n        userId,\r\n        details\r\n    });\r\n    await audit.save();\r\n};\r\n\r\nexport default recordAudit;"
+        }
+    ]
+}

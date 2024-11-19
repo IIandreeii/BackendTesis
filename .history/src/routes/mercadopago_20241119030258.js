@@ -418,7 +418,7 @@ router.get('/audits/:charityId', async (req, res) => {
         const userIds = audits.map(audit => audit.userId).filter(userId => userId);
         const charityIds = audits.map(audit => audit.charityId).filter(charityId => charityId);
 
-        const users = await User.find({ _id: { $in: userIds } }).select('nombre');
+        const users = await User.find({ _id: { $in: userIds } }).select('name');
         const charities = await Charity.find({ _id: { $in: charityIds } }).select('nombre');
 
         const userMap = users.reduce((acc, user) => {

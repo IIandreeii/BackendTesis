@@ -118,27 +118,16 @@ router.post('/messages', async (req, res) => {
 router.get('/messages', async (req, res) => {
   const { chatId } = req.query;
 
-  // Validación de chatId
   if (!chatId) {
     return res.status(400).json({ error: 'chatId is required' });
   }
 
-  if (!mongoose.isValidObjectId(chatId)) {
-    return res.status(400).json({ error: 'Invalid chatId format' });
-  }
-
   try {
-    // Buscar mensajes por chatId
     const messages = await Message.find({ chatId }).sort({ createdAt: 1 });
-
-    // Verificar si se encontraron mensajes
     if (messages.length === 0) {
       return res.status(404).json({ error: 'No messages found for this chatId' });
     }
-
-    // Responder con los mensajes encontrados
     res.json(messages);
-
   } catch (error) {
     console.error('Error fetching messages:', error);
     res.status(500).json({ error: 'Error fetching messages' });
@@ -177,6 +166,7 @@ router.post('/chats', async (req, res) => {
     res.status(500).json({ error: 'Error creating or fetching chat' });
   }
 });
+
 
 
 router.post('/upload', upload.single('image'), (req, res) => {

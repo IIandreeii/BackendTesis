@@ -414,33 +414,21 @@ router.get('/audits/:charityId', async (req, res) => {
     try {
         const audits = await Audit.find({ charityId }).sort({ timestamp: -1 });
 
-        // Obtener los nombres de los usuarios y organizaciones que realizaron las acciones
+        // Obtener los nombres de los usuarios que realizaron las acciones
         const userIds = audits.map(audit => audit.userId).filter(userId => userId);
-        const charityIds = audits.map(audit => audit.charityId).filter(charityId => charityId);
-
         const users = await User.find({ _id: { $in: userIds } }).select('nombre');
-        const charities = await Charity.find({ _id: { $in: charityIds } }).select('nombre');
-
         const userMap = users.reduce((acc, user) => {
             acc[user._id] = user.name;
             return acc;
         }, {});
 
-        const charityMap = charities.reduce((acc, charity) => {
-            acc[charity._id] = charity.nombre;
-            return acc;
-        }, {});
+        // Agregar el nombre del usuario a cada registro de auditoría
+        const auditsWithUserNames = audits.map(audit => ({
+            ...audit.toObject(),
+            userName: userMap[audit.userId] || 'Usuario desconocido'
+        }));
 
-        // Agregar el nombre del usuario o de la organización a cada registro de auditoría
-        const auditsWithNames = audits.map(audit => {
-            const userName = userMap[audit.userId] || charityMap[audit.charityId] || 'Desconocido';
-            return {
-                ...audit.toObject(),
-                userName
-            };
-        });
-
-        res.status(200).json(auditsWithNames);
+        res.status(200).json(auditsWithUserNames);
     } catch (error) {
         console.error(error);
         res.status(500).json({ message: `Error al obtener las auditorías: ${error.message}` });

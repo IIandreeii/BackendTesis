@@ -7,8 +7,6 @@ import { generateReport } from '../services/reportesdonaciones.js';
 import donationproducts from '../models/donationproducts.js';
 import { generateExcelReport } from '../services/reportescomida.js';
 import recordAudit from '../lib/recordAudit.js';
-import Audit from '../models/auditorias.js';
-import User from '../models/user.js';
 
 const router = express.Router();
 
@@ -293,7 +291,6 @@ router.get('/mercadopago/report/in-kind/:charityId', async (req, res) => {
         }, 0);
 
         const report = donationsInKind.map(donation => ({
-            donationId: donation._id,
             donorName: donation.donorName,
             itemType: donation.itemType,
             quantity: donation.quantity,
@@ -303,16 +300,14 @@ router.get('/mercadopago/report/in-kind/:charityId', async (req, res) => {
             createdAt: donation.createdAt
         }));
 
-        // Incluir los IDs de las donaciones en los detalles de la auditoría
-        const donationIds = donationsInKind.map(donation => donation._id);
-
-        await recordAudit('report', charityId, null, userId, { reportType: 'in-kind', donationIds });
+        await recordAudit('report', charityId, null, userId, { reportType: 'in-kind' });
         res.json({ totalValue, report });
     } catch (error) {
         console.error(error);
         res.status(500).json({ message: `Error al generar el reporte: ${error.message}` });
     }
 });
+
 // Editar una donación existente
 router.put('/mercadopago/report/in-kind/:donationId', async (req, res) => {
     const { donationId } = req.params;
@@ -323,7 +318,7 @@ router.put('/mercadopago/report/in-kind/:donationId', async (req, res) => {
     }
 
     try {
-        const donation = await donationproducts.findById(donationId);
+        const donation = await DonationProducts.findById(donationId);
         if (!donation) {
             return res.status(404).json({ message: 'Donación no encontrada' });
         }
@@ -333,7 +328,7 @@ router.put('/mercadopago/report/in-kind/:donationId', async (req, res) => {
         await donation.save();
 
         await recordAudit('edit', donation.charityId, donationId, userId, { before, after: donation.toObject() });
-        res.status(200).json({ message: 'Donación editada correctamente', donation });
+        res.status(200).json(donation);
     } catch (error) {
         res.status(500).json({ message: `Error al editar la donación: ${error.message}` });
     }
@@ -349,18 +344,17 @@ router.delete('/mercadopago/report/in-kind/:donationId', async (req, res) => {
     }
 
     try {
-        const donation = await donationproducts.findById(donationId);
+        const donation = await DonationProducts.findById(donationId);
         if (!donation) {
             return res.status(404).json({ message: 'Donación no encontrada' });
         }
 
         const before = donation.toObject();
-        await donationproducts.deleteOne({ _id: donationId });
+        await donation.remove();
 
         await recordAudit('delete', donation.charityId, donationId, userId, { before, reason });
         res.status(200).json({ message: 'Donación eliminada' });
     } catch (error) {
-        console.error(error);
         res.status(500).json({ message: `Error al eliminar la donación: ${error.message}` });
     }
 });
@@ -404,48 +398,6 @@ router.get('/mercadopago/report/in-kind/excel/annual/:charityId', async (req, re
     await generateExcelReport(charityId, 'annual', res);
 });
 
-
-router.get('/audits/:charityId', async (req, res) => {
-    const { charityId } = req.params;
-    if (!mongoose.isValidObjectId(charityId)) {
-        return res.status(400).json({ message: 'ID de organización benéfica no válido' });
-    }
-
-    try {
-        const audits = await Audit.find({ charityId }).sort({ timestamp: -1 });
-
-        // Obtener los nombres de los usuarios y organizaciones que realizaron las acciones
-        const userIds = audits.map(audit => audit.userId).filter(userId => userId);
-        const charityIds = audits.map(audit => audit.charityId).filter(charityId => charityId);
-
-        const users = await User.find({ _id: { $in: userIds } }).select('nombre');
-        const charities = await Charity.find({ _id: { $in: charityIds } }).select('nombre');
-
-        const userMap = users.reduce((acc, user) => {
-            acc[user._id] = user.name;
-            return acc;
-        }, {});
-
-        const charityMap = charities.reduce((acc, charity) => {
-            acc[charity._id] = charity.nombre;
-            return acc;
-        }, {});
-
-        // Agregar el nombre del usuario o de la organización a cada registro de auditoría
-        const auditsWithNames = audits.map(audit => {
-            const userName = userMap[audit.userId] || charityMap[audit.charityId] || 'Desconocido';
-            return {
-                ...audit.toObject(),
-                userName
-            };
-        });
-
-        res.status(200).json(auditsWithNames);
-    } catch (error) {
-        console.error(error);
-        res.status(500).json({ message: `Error al obtener las auditorías: ${error.message}` });
-    }
-});
 
 
 

@@ -7,7 +7,6 @@ import jwt from 'jsonwebtoken';
 import { URLSearchParams } from 'url';
 import axios from 'axios';
 import { revokeToken, checkRevokedToken } from '../lib/revokedTokens.js';
-import recordAudit from '../lib/recordAudit.js';
 
 
 
@@ -44,56 +43,44 @@ router.post('/:id/update', async(req, res, next) => {
     }
 });
 
+
+
+
+
+
+
+
+
+
 router.post('/signin', async (req, res, next) => {
     passport.authenticate('local.signin', async (err, user, info) => {
         try {
             if (err) {
-                await recordAudit('login', null, null, null, { message: 'Error en autenticación', error: err.message });
                 return next(err);
             }
             if (!user) {
-                const auditDetails = { message: 'Autenticación fallida' };
+                // Verifica si el error es debido a un email incorrecto o una contraseña incorrecta
                 if (info && info.message === 'Usuario no encontrado') {
-                    auditDetails.message = 'Usuario no encontrado';
-                    await recordAudit('login', null, null, null, auditDetails);
                     return res.status(401).json({ message: 'Usuario no encontrado' });
                 }
                 if (info && info.message === 'Contraseña incorrecta') {
-                    auditDetails.message = 'Contraseña incorrecta';
-                    await recordAudit('login', null, null, null, auditDetails);
                     return res.status(401).json({ message: 'Contraseña incorrecta' });
                 }
-                await recordAudit('login', null, null, null, auditDetails);
                 return res.status(401).json({ message: 'Autenticación fallida' });
             }
             req.login(user, { session: false }, async (error) => {
-                if (error) {
-                    await recordAudit('login', null, null, user._id, { message: 'Error en autenticación', error: error.message });
-                    return next(error);
-                }
+                if (error) return next(error);
                 
                 const body = { _id: user._id, email: user.email, role: user.role };
                 const token = jwt.sign({ user: body }, 'top_secret');
                 
-                // Verificar si el ID pertenece a un usuario o a una organización benéfica
-                const charity = await Charity.findById(user._id);
-                const userId = charity ? null : user._id;
-                const charityId = charity ? user._id : null;
-
-                await recordAudit('login', charityId, null, userId, { message: 'Inicio de sesión exitoso' });
                 return res.json({ token });
             });
         } catch (error) {
-            await recordAudit('login', null, null, null, { message: 'Error en autenticación', error: error.message });
             return next(error);
         }
     })(req, res, next);
 });
-
-
-
-
-
 
 
 // Asegúrate de ajustar la ruta según tu estructura de proyecto
@@ -112,8 +99,7 @@ router.get('/profile', passport.authenticate('jwt', { session: false }), async (
                     dni: user.dni,
                     apellido: user.apellido,
                     nombre: user.nombre,
-                    role: user.role,
-                    userType: user.userType,
+                    role: user.role
                 },
                 token: req.query.secret_token
             });
