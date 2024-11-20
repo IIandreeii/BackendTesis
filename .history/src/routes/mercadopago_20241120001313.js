@@ -218,7 +218,7 @@ router.get('/mercadopago/success', async (req, res) => {
 
         await donation.save();
 
-        res.redirect('https://rwggxws5-3000.brs.devtunnels.ms/gracias');
+        res.redirect('http://localhost:3000/gracias');
     } catch (error) {
         if (error.response) {
             console.error('Error en la respuesta de la API de Mercado Pago:', error.response.data);

@@ -3,11 +3,19 @@
     "activeCommit": 0,
     "commits": [
         {
-            "activePatchIndex": 0,
+            "activePatchIndex": 2,
             "patches": [
                 {
                     "date": 1731015109446,
                     "content": "Index: \n===================================================================\n--- \n+++ \n"
+                },
+                {
+                    "date": 1732076464184,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -0,0 +1,22 @@\n+import axios from 'axios';\r\n+\r\n+export const mercadoPagoService = {\r\n+    createPreference: async (accessToken, preferenceData) => {\r\n+        const response = await axios.post('https://api.mercadopago.com/checkout/preferences', preferenceData, {\r\n+            headers: {\r\n+                'Authorization': `Bearer ${accessToken}`,\r\n+                'Content-Type': 'application/json',\r\n+            },\r\n+        });\r\n+        return response.data;\r\n+    },\r\n+\r\n+    getPaymentDetails: async (paymentId, accessToken) => {\r\n+        const response = await axios.get(`https://api.mercadopago.com/v1/payments/${paymentId}`, {\r\n+            headers: {\r\n+                'Authorization': `Bearer ${accessToken}`,\r\n+            },\r\n+        });\r\n+        return response.data;\r\n+    }\r\n+};\r\n"
+                },
+                {
+                    "date": 1732076470206,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -0,0 +1,30 @@\n+import axios from 'axios';\r\n+\r\n+const createPaymentPreference = async (preferenceData, accessToken) => {\r\n+    try {\r\n+        const response = await axios.post('https://api.mercadopago.com/checkout/preferences', preferenceData, {\r\n+            headers: {\r\n+                'Authorization': `Bearer ${accessToken}`,\r\n+                'Content-Type': 'application/json',\r\n+            },\r\n+        });\r\n+        return response.data;\r\n+    } catch (error) {\r\n+        throw new Error(`Error al crear la preferencia de pago: ${error.message}`);\r\n+    }\r\n+};\r\n+\r\n+const getPaymentDetails = async (paymentId, accessToken) => {\r\n+    try {\r\n+        const response = await axios.get(`https://api.mercadopago.com/v1/payments/${paymentId}`, {\r\n+            headers: {\r\n+                'Authorization': `Bearer ${accessToken}`,\r\n+            },\r\n+        });\r\n+        return response.data;\r\n+    } catch (error) {\r\n+        throw new Error(`Error al obtener los detalles del pago: ${error.message}`);\r\n+    }\r\n+};\r\n+\r\n+export { createPaymentPreference, getPaymentDetails };\r\n"
                 }
             ],
             "date": 1731015109446,

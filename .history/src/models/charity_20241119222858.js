@@ -45,8 +45,7 @@ const CharitySchema = new Schema({
   tokenExpiration: { // Campo para almacenar el tiempo de expiración
     type: Number,
     required: false 
-  },  
-  codeVerifier: { // Campo para almacenar el code_verifier
+  },  codeVerifier: { // Campo para almacenar el code_verifier
     type: String,
     required: false
   }

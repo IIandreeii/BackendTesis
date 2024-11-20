@@ -166,26 +166,15 @@ router.post('/mercadopago/donate/:id', async (req, res) => {
     }
 });
 
-router.get('/mercadopago/success', async (req, res) => {
+router.get('/mercadopago/success:', async (req, res) => {
     const paymentId = req.query.payment_id;
-    const charityId = req.query.external_reference; // Obtener el charityId de la referencia externa
     console.log('Payment ID:', paymentId); // Agregar registro del payment_id
-    console.log('Charity ID:', charityId); // Agregar registro del charity_id
-
-    if (!mongoose.isValidObjectId(charityId)) {
-        return res.status(400).json({ message: 'ID de organización benéfica no válido' });
-    }
 
     // Esperar 5 segundos antes de realizar la consulta
     await new Promise(resolve => setTimeout(resolve, 5000));
 
     try {
-        const charity = await Charity.findById(charityId);
-        if (!charity) {
-            return res.status(404).json({ message: 'Organización benéfica no encontrada' });
-        }
-
-        const response = await getPaymentDetails(paymentId, charity.accessToken);
+        const response = await getPaymentDetails(paymentId, 'APP_USR-1901957005842671-111119-86e781d67eaa4603a58a5fffee6a37dc-2090145757');
 
         const paymentDetails = response;
         const payer = paymentDetails.payer || {};
@@ -197,6 +186,7 @@ router.get('/mercadopago/success', async (req, res) => {
         const paymentAmount = paymentDetails.transaction_amount;
         const paymentStatus = paymentDetails.status;
         const paymentMethod = paymentDetails.payment_method_id;
+        const charityId = paymentDetails.external_reference;
 
         if (!charityId || charityId === 'null') {
             throw new Error('El ID de la organización benéfica no está disponible en external_reference.');
@@ -218,7 +208,7 @@ router.get('/mercadopago/success', async (req, res) => {
 
         await donation.save();
 
-        res.redirect('https://rwggxws5-3000.brs.devtunnels.ms/gracias');
+        res.redirect('http://localhost:3000/gracias');
     } catch (error) {
         if (error.response) {
             console.error('Error en la respuesta de la API de Mercado Pago:', error.response.data);

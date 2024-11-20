@@ -9,102 +9,10 @@ import { generateExcelReport } from '../services/reportescomida.js';
 import recordAudit from '../lib/recordAudit.js';
 import Audit from '../models/auditorias.js';
 import User from '../models/user.js';
-import crypto from 'crypto';
-import { createPaymentPreference, getPaymentDetails } from '../services/mercadopagoService.js';
 
 const router = express.Router();
 
 // Ruta para autenticar a la organización benéfica
-
-
-function generateCodeVerifier() {
-    return crypto.randomBytes(32).toString('hex');
-}
-
-function generateCodeChallenge(codeVerifier) {
-    return crypto.createHash('sha256').update(codeVerifier).digest('base64url');
-}
-
-router.get('/mercadopago/auth/:id', async (req, res) => {
-    const { id } = req.params;
-    const client_id = '1901957005842671';
-    const redirect_uri = 'https://helped-suitable-elk.ngrok-free.app/mercadopago/callback';
-
-    const codeVerifier = generateCodeVerifier();
-    const codeChallenge = generateCodeChallenge(codeVerifier);
-
-    // Guardar el codeVerifier en la base de datos
-    const charity = await Charity.findById(id);
-    if (charity) {
-        charity.codeVerifier = codeVerifier;
-        await charity.save();
-    } else {
-        return res.status(404).json({ message: 'Organización benéfica no encontrada' });
-    }
-
-    const authorizationUrl = `https://auth.mercadopago.com.pe/authorization?client_id=${client_id}&response_type=code&platform_id=mp&redirect_uri=${redirect_uri}&state=${id}&code_challenge=${codeChallenge}&code_challenge_method=S256`;
-    res.redirect(authorizationUrl);
-});
-
-// Nueva ruta para manejar la redirección inicial desde Mercado Pago
-router.get('/mercadopago/callback', (req, res) => {
-    const { code, state } = req.query;
-    const id = state;
-
-    res.redirect(`/mercadopago/callback/${id}?code=${code}`);
-});
-
-// Callback para recibir el código de autorización
-router.get('/mercadopago/callback/:id', async (req, res) => {
-    const { id } = req.params;
-    const authorizationCode = req.query.code;
-
-    if (!authorizationCode) {
-        return res.status(400).json({ message: 'Código de autorización no proporcionado' });
-    }
-
-    try {
-        const client_id = '1901957005842671';
-        const client_secret = 'wrdU655Oeu2RKIEb2Ph92CAjVT8hZ4ti';
-        const redirect_uri = 'https://helped-suitable-elk.ngrok-free.app/mercadopago/callback';
-
-        const charity = await Charity.findById(id);
-        if (!charity) {
-            return res.status(404).json({ message: 'Organización benéfica no encontrada' });
-        }
-
-        const codeVerifier = charity.codeVerifier;
-
-        const params = new URLSearchParams();
-        params.append('grant_type', 'authorization_code');
-        params.append('client_id', client_id);
-        params.append('client_secret', client_secret);
-        params.append('code', authorizationCode);
-        params.append('redirect_uri', redirect_uri);
-        params.append('code_verifier', codeVerifier);
-
-        const response = await axios.post('https://api.mercadopago.com/oauth/token', params, {
-            headers: {
-                'Content-Type': 'application/x-www-form-urlencoded',
-            },
-        });
-
-        const { access_token, refresh_token, expires_in } = response.data;
-        const expirationTime = Math.floor(Date.now() / 1000) + expires_in;
-
-        charity.accessToken = access_token;
-        charity.refreshToken = refresh_token;
-        charity.tokenExpiration = expirationTime;
-        charity.codeVerifier = null; // Limpiar el codeVerifier después de usarlo
-        await charity.save();
-
-        return res.redirect('https://rwggxws5-3000.brs.devtunnels.ms/profile'); // Redirigir si la autorización es válida
-    } catch (error) {
-        console.error(error);
-        res.status(500).json({ message: `Error al obtener el token: ${error.response ? error.response.data : error.message}` });
-    }
-});
-
 
 
 router.get('/charities', async (req, res) => {
@@ -153,11 +61,16 @@ router.post('/mercadopago/donate/:id', async (req, res) => {
             external_reference: id,
         };
 
-        const response = await createPaymentPreference(preferenceData, charity.accessToken);
+        const response = await axios.post('https://api.mercadopago.com/checkout/preferences', preferenceData, {
+            headers: {
+                'Authorization': `Bearer ${charity.accessToken}`,
+                'Content-Type': 'application/json',
+            },
+        });
 
         return res.json({
             message: 'Preferencia de pago creada',
-            init_point: response.init_point,
+            init_point: response.data.init_point,
         });
 
     } catch (error) {
@@ -168,26 +81,15 @@ router.post('/mercadopago/donate/:id', async (req, res) => {
 
 router.get('/mercadopago/success', async (req, res) => {
     const paymentId = req.query.payment_id;
-    const charityId = req.query.external_reference; // Obtener el charityId de la referencia externa
-    console.log('Payment ID:', paymentId); // Agregar registro del payment_id
-    console.log('Charity ID:', charityId); // Agregar registro del charity_id
-
-    if (!mongoose.isValidObjectId(charityId)) {
-        return res.status(400).json({ message: 'ID de organización benéfica no válido' });
-    }
-
-    // Esperar 5 segundos antes de realizar la consulta
-    await new Promise(resolve => setTimeout(resolve, 5000));
 
     try {
-        const charity = await Charity.findById(charityId);
-        if (!charity) {
-            return res.status(404).json({ message: 'Organización benéfica no encontrada' });
-        }
+        const response = await axios.get(`https://api.mercadopago.com/v1/payments/${paymentId}`, {
+            headers: {
+                'Authorization': `Bearer APP_USR-1901957005842671-111119-86e781d67eaa4603a58a5fffee6a37dc-2090145757`,
+            },
+        });
 
-        const response = await getPaymentDetails(paymentId, charity.accessToken);
-
-        const paymentDetails = response;
+        const paymentDetails = response.data;
         const payer = paymentDetails.payer || {};
         const card = paymentDetails.card || {};
 
@@ -197,6 +99,7 @@ router.get('/mercadopago/success', async (req, res) => {
         const paymentAmount = paymentDetails.transaction_amount;
         const paymentStatus = paymentDetails.status;
         const paymentMethod = paymentDetails.payment_method_id;
+        const charityId = paymentDetails.external_reference;
 
         if (!charityId || charityId === 'null') {
             throw new Error('El ID de la organización benéfica no está disponible en external_reference.');
@@ -218,18 +121,10 @@ router.get('/mercadopago/success', async (req, res) => {
 
         await donation.save();
 
-        res.redirect('https://rwggxws5-3000.brs.devtunnels.ms/gracias');
+        res.redirect('http://localhost:3000/gracias');
     } catch (error) {
-        if (error.response) {
-            console.error('Error en la respuesta de la API de Mercado Pago:', error.response.data);
-            res.status(500).json({ message: `Error en la respuesta de la API de Mercado Pago: ${error.response.data.message}`, details: error.response.data });
-        } else if (error.request) {
-            console.error('Error en la solicitud a la API de Mercado Pago:', error.request);
-            res.status(500).json({ message: 'Error en la solicitud a la API de Mercado Pago' });
-        } else {
-            console.error('Error al procesar la solicitud:', error.message);
-            res.status(500).json({ message: `Error al procesar la solicitud: ${error.message}` });
-        }
+        console.error(error);
+        res.status(500).json({ message: `Error al obtener los detalles del pago o guardar la donación: ${error.message}` });
     }
 });
 

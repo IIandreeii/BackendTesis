@@ -15,7 +15,7 @@ const __dirname = path.dirname(__filename);
 const socketHandlers = (server) => {
     const io = new Server(server, {
         cors: {
-            origin: 'https://rwggxws5-3000.brs.devtunnels.ms', 
+            origin: 'https://rwggxws5-3001.brs.devtunnels.ms/', 
             methods: ['GET', 'POST'],
         },
     });
