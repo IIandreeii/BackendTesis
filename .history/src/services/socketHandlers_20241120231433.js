@@ -83,7 +83,7 @@ const socketHandlers = (server) => {
             }
         });
 
-
+        // Subir imagen
         socket.on('uploadImage', async ({ image, imageName }) => {
             try {
                 const base64Data = image.replace(/^data:image\/\w+;base64,/, '');
@@ -112,8 +112,10 @@ const socketHandlers = (server) => {
                     }
                     const likeIndex = publication.likes.findIndex(like => like.user?.toString() === userId || like.charity?.toString() === charityId);
                     if (likeIndex === -1) {
+
                         publication.likes.push({ user: userId, charity: charityId });
                     } else {
+                       
                         publication.likes.splice(likeIndex, 1);
                     }
                     await publication.save();
@@ -125,7 +127,7 @@ const socketHandlers = (server) => {
         });
 
 
-        socket.on('deletePublication', async ({ publicationId, charityId }, callback) => {
+        socket.on('deletePublication', async ({ publicationId, userId }, callback) => {
             try {
                 const publication = await Publication.findById(publicationId);
                 if (!publication) {
@@ -133,18 +135,13 @@ const socketHandlers = (server) => {
                     return;
                 }
         
-                // Verificar si la organización tiene permiso para eliminar la publicación
-                if (!publication.charity) {
-                    callback({ success: false, message: 'La publicación no tiene una organización asociada' });
-                    return;
-                }
-        
-                if (publication.charity.toString() !== charityId) {
+                // Verificar si el usuario tiene permiso para eliminar la publicación
+                if (publication.user.toString() !== userId) {
                     callback({ success: false, message: 'No tienes permiso para eliminar esta publicación' });
                     return;
                 }
         
-                await Publication.findByIdAndDelete(publicationId);
+                await publication.remove();
                 io.emit('deletePublication', publicationId);
                 callback({ success: true, message: 'Publicación eliminada con éxito' });
             } catch (error) {
@@ -157,11 +154,6 @@ const socketHandlers = (server) => {
 
         socket.on('editPublication', async ({ publicationId, formData }, callback) => {
             try {
-                if (!formData) {
-                    callback({ success: false, message: 'Datos del formulario no proporcionados' });
-                    return;
-                }
-        
                 const { title, description, date, time, location, image } = formData;
                 const imageUrl = image ? `/public/imagenes/${image}` : '';
         

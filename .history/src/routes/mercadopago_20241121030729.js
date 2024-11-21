@@ -483,7 +483,9 @@ router.get('/audits/:charityId', async (req, res) => {
                 userName
             };
         });
+
         res.status(200).json(auditsWithNames);
+        console.log(auditsWithNames);
     } catch (error) {
         console.error(error);
         res.status(500).json({ message: `Error al obtener las auditorías: ${error.message}` });

@@ -354,9 +354,6 @@ router.get('/mercadopago/report/in-kind/:charityId', async (req, res) => {
         res.status(500).json({ message: `Error al generar el reporte: ${error.message}` });
     }
 });
-
-
-
 // Editar una donación existente
 router.put('/mercadopago/report/in-kind/:donationId', async (req, res) => {
     const { donationId } = req.params;
@@ -483,6 +480,7 @@ router.get('/audits/:charityId', async (req, res) => {
                 userName
             };
         });
+
         res.status(200).json(auditsWithNames);
     } catch (error) {
         console.error(error);

@@ -349,6 +349,7 @@ router.get('/mercadopago/report/in-kind/:charityId', async (req, res) => {
 
         await recordAudit('report', charityId, null, userId, { reportType: 'in-kind', donationIds });
         res.json({ totalValue, report });
+        conso
     } catch (error) {
         console.error(error);
         res.status(500).json({ message: `Error al generar el reporte: ${error.message}` });
@@ -483,6 +484,7 @@ router.get('/audits/:charityId', async (req, res) => {
                 userName
             };
         });
+
         res.status(200).json(auditsWithNames);
     } catch (error) {
         console.error(error);

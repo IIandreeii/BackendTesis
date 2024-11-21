@@ -125,7 +125,7 @@ const socketHandlers = (server) => {
         });
 
 
-        socket.on('deletePublication', async ({ publicationId, charityId }, callback) => {
+        socket.on('deletePublication', async ({ publicationId, userId }, callback) => {
             try {
                 const publication = await Publication.findById(publicationId);
                 if (!publication) {
@@ -133,18 +133,13 @@ const socketHandlers = (server) => {
                     return;
                 }
         
-                // Verificar si la organización tiene permiso para eliminar la publicación
-                if (!publication.charity) {
-                    callback({ success: false, message: 'La publicación no tiene una organización asociada' });
-                    return;
-                }
-        
-                if (publication.charity.toString() !== charityId) {
+                // Verificar si el usuario tiene permiso para eliminar la publicación
+                if (publication.user.toString() !== userId) {
                     callback({ success: false, message: 'No tienes permiso para eliminar esta publicación' });
                     return;
                 }
         
-                await Publication.findByIdAndDelete(publicationId);
+                await publication.remove();
                 io.emit('deletePublication', publicationId);
                 callback({ success: true, message: 'Publicación eliminada con éxito' });
             } catch (error) {

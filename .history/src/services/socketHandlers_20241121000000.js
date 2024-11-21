@@ -125,7 +125,7 @@ const socketHandlers = (server) => {
         });
 
 
-        socket.on('deletePublication', async ({ publicationId, charityId }, callback) => {
+        socket.on('deletePublication', async ({ publicationId, userId }, callback) => {
             try {
                 const publication = await Publication.findById(publicationId);
                 if (!publication) {
@@ -139,12 +139,12 @@ const socketHandlers = (server) => {
                     return;
                 }
         
-                if (publication.charity.toString() !== charityId) {
+                if (publication.charity.toString() !== userId) {
                     callback({ success: false, message: 'No tienes permiso para eliminar esta publicación' });
                     return;
                 }
         
-                await Publication.findByIdAndDelete(publicationId);
+                await publication.remove();
                 io.emit('deletePublication', publicationId);
                 callback({ success: true, message: 'Publicación eliminada con éxito' });
             } catch (error) {

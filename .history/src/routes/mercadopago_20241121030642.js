@@ -483,6 +483,7 @@ router.get('/audits/:charityId', async (req, res) => {
                 userName
             };
         });
+
         res.status(200).json(auditsWithNames);
     } catch (error) {
         console.error(error);

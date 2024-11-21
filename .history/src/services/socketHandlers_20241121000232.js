@@ -144,7 +144,7 @@ const socketHandlers = (server) => {
                     return;
                 }
         
-                await Publication.findByIdAndDelete(publicationId);
+                await publication.remove();
                 io.emit('deletePublication', publicationId);
                 callback({ success: true, message: 'Publicación eliminada con éxito' });
             } catch (error) {

@@ -98,7 +98,7 @@ router.get('/mercadopago/callback/:id', async (req, res) => {
         charity.codeVerifier = null; // Limpiar el codeVerifier después de usarlo
         await charity.save();
 
-        return res.redirect('http://localhost:3000/profile'); // Redirigir si la autorización es válida
+        return res.redirect('http://localhost:3000//profile'); // Redirigir si la autorización es válida
     } catch (error) {
         console.error(error);
         res.status(500).json({ message: `Error al obtener el token: ${error.response ? error.response.data : error.message}` });
@@ -218,7 +218,7 @@ router.get('/mercadopago/success', async (req, res) => {
 
         await donation.save();
 
-        res.redirect('http://localhost:3000/gracias');
+        res.redirect('https://rwggxws5-3000.brs.devtunnels.ms/gracias');
     } catch (error) {
         if (error.response) {
             console.error('Error en la respuesta de la API de Mercado Pago:', error.response.data);
@@ -354,9 +354,6 @@ router.get('/mercadopago/report/in-kind/:charityId', async (req, res) => {
         res.status(500).json({ message: `Error al generar el reporte: ${error.message}` });
     }
 });
-
-
-
 // Editar una donación existente
 router.put('/mercadopago/report/in-kind/:donationId', async (req, res) => {
     const { donationId } = req.params;
@@ -483,6 +480,7 @@ router.get('/audits/:charityId', async (req, res) => {
                 userName
             };
         });
+
         res.status(200).json(auditsWithNames);
     } catch (error) {
         console.error(error);

@@ -83,7 +83,7 @@ const socketHandlers = (server) => {
             }
         });
 
-
+        // Subir imagen
         socket.on('uploadImage', async ({ image, imageName }) => {
             try {
                 const base64Data = image.replace(/^data:image\/\w+;base64,/, '');
@@ -112,8 +112,10 @@ const socketHandlers = (server) => {
                     }
                     const likeIndex = publication.likes.findIndex(like => like.user?.toString() === userId || like.charity?.toString() === charityId);
                     if (likeIndex === -1) {
+                        // Si el usuario o la organización no ha dado like, agregar su ID al array de likes
                         publication.likes.push({ user: userId, charity: charityId });
                     } else {
+                        // Si el usuario o la organización ya ha dado like, quitar su ID del array de likes
                         publication.likes.splice(likeIndex, 1);
                     }
                     await publication.save();
@@ -121,69 +123,6 @@ const socketHandlers = (server) => {
                 }
             } catch (error) {
                 console.error('Error al dar like a la publicación:', error);
-            }
-        });
-
-
-        socket.on('deletePublication', async ({ publicationId, charityId }, callback) => {
-            try {
-                const publication = await Publication.findById(publicationId);
-                if (!publication) {
-                    callback({ success: false, message: 'Publicación no encontrada' });
-                    return;
-                }
-        
-                // Verificar si la organización tiene permiso para eliminar la publicación
-                if (!publication.charity) {
-                    callback({ success: false, message: 'La publicación no tiene una organización asociada' });
-                    return;
-                }
-        
-                if (publication.charity.toString() !== charityId) {
-                    callback({ success: false, message: 'No tienes permiso para eliminar esta publicación' });
-                    return;
-                }
-        
-                await Publication.findByIdAndDelete(publicationId);
-                io.emit('deletePublication', publicationId);
-                callback({ success: true, message: 'Publicación eliminada con éxito' });
-            } catch (error) {
-                console.error('Error al eliminar la publicación:', error);
-                callback({ success: false, message: 'Error al eliminar la publicación' });
-            }
-        });
-
-
-
-        socket.on('editPublication', async ({ publicationId, formData }, callback) => {
-            try {
-                if (!formData) {
-                    callback({ success: false, message: 'Datos del formulario no proporcionados' });
-                    return;
-                }
-        
-                const { title, description, date, time, location, image } = formData;
-                const imageUrl = image ? `/public/imagenes/${image}` : '';
-        
-                const publication = await Publication.findById(publicationId);
-                if (!publication) {
-                    callback({ success: false, message: 'Publicación no encontrada' });
-                    return;
-                }
-        
-                // Actualizar los campos de la publicación
-                publication.title = title || publication.title;
-                publication.description = description || publication.description;
-                publication.date = new Date(`${date}T${time}`) || publication.date;
-                publication.location = location || publication.location;
-                publication.imageUrl = imageUrl || publication.imageUrl;
-        
-                await publication.save();
-                io.emit('updatePublication', publication);
-                callback({ success: true, message: 'Publicación editada con éxito' });
-            } catch (error) {
-                console.error('Error al editar la publicación:', error);
-                callback({ success: false, message: 'Error al editar la publicación' });
             }
         });
         
